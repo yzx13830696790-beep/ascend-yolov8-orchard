@@ -136,7 +136,7 @@ def sample_calibration(gts, n, seed=0, per_scene=True):
 
 
 def distribution_report(gts):
-    """校准集/验证集的分布统计（用于落盘与面试讲解）。"""
+    """校准集/验证集的分布统计（用于落盘与人工复核讲解）。"""
     scenes = {}
     for iid, g in gts.items():
         scenes.setdefault(g.get("scene", "default"), 0)
