@@ -1,0 +1,7 @@
+{
+  "n_boxes": 8400,
+  "multiclass_vectorized_ms": 104.654,
+  "kept": 300,
+  "parity_singleclass_with_naive_on_1500": true,
+  "note": "numpy 向量化 NMS（8400 框多类）；单类等价性已验。C++ 版见 deploy/postprocess/nms.cpp（目标机编译，目标 <1ms）"
+}

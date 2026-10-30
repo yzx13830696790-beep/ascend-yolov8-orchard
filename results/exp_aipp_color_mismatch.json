@@ -1,0 +1,18 @@
+{
+  "image_mae": {
+    "correct": 0.41323941454475305,
+    "wrong_matrix": 2.0663100405092596
+  },
+  "detector_map50_95": {
+    "base_rgb": 0.1408031518288357,
+    "yuv_bt601_correct": 0.14237353619746657,
+    "yuv_bt601_to_bt709_wrong": 0.14002980548234548,
+    "map_drop_wrong_matrix_pt": 0.23437307151210895
+  },
+  "tensor_max_abs_err_aipp": {
+    "correct": 0.008191823959350586,
+    "forgot_scale255": 33.68731689453125,
+    "std_as_var": 0.034487009048461914
+  },
+  "note": "合成数据上的复现实验，量化 AIPP 配置错误的量级；非 310B 实测"
+}

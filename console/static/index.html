@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>orchard310b · 模型评测与量化实验平台</title>
+<style>
+  :root{
+    --bg:#f6f5f2; --panel:#fffefb; --line:#e6e2d8; --ink:#242320;
+    --muted:#77726a; --accent:#2f6f4e; --accent-soft:#e8f1ea;
+    --warn:#b4541f; --warn-soft:#fbeee5; --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  header{padding:22px 28px 0}
+  .brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  h1{margin:0;font-size:19px;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:12.5px}
+  .badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .badge{background:var(--accent-soft);color:var(--accent);border:1px solid #cfe0d5;
+         padding:3px 10px;border-radius:999px;font-size:12px;font-family:var(--mono)}
+  nav{display:flex;gap:2px;padding:16px 28px 0;border-bottom:1px solid var(--line);margin-top:14px}
+  nav button{background:none;border:none;border-bottom:2px solid transparent;
+             padding:9px 14px;font-size:13.5px;color:var(--muted);cursor:pointer;font-family:inherit}
+  nav button:hover{color:var(--ink)}
+  nav button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  main{padding:22px 28px 60px;max-width:1180px}
+  .tab{display:none}.tab.on{display:block}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .card .k{font-size:12px;color:var(--muted);letter-spacing:.3px}
+  .card .v{font-size:24px;font-weight:600;font-family:var(--mono);margin-top:6px}
+  .card .v small{font-size:13px;font-weight:400;color:var(--muted)}
+  .ok{color:var(--accent)} .bad{color:var(--warn)}
+  h2{font-size:14px;margin:24px 0 10px;font-weight:600}
+  table{width:100%;border-collapse:collapse;background:var(--panel);
+        border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;font-size:13px;border-bottom:1px solid var(--line)}
+  th{background:#faf9f5;font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.3px}
+  tr:last-child td{border-bottom:none}
+  td.num{font-family:var(--mono)}
+  .form{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  input,select{font:inherit;padding:7px 10px;border:1px solid var(--line);
+               border-radius:7px;background:#fff;color:var(--ink)}
+  button.act{background:var(--accent);color:#fff;border:none;padding:8px 16px;
+             border-radius:7px;font:inherit;cursor:pointer}
+  button.act:hover{background:#285f43}
+  button.ghost{background:#fff;border:1px solid var(--line);color:var(--ink);
+               padding:7px 14px;border-radius:7px;font:inherit;cursor:pointer}
+  .muted{color:var(--muted);font-size:12.5px}
+  .figure{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .figure img{max-width:100%;display:block;margin:0 auto}
+  .note{background:var(--warn-soft);border-left:3px solid var(--warn);
+        padding:10px 14px;border-radius:0 8px 8px 0;color:#6b3413;font-size:12.5px;margin:14px 0}
+  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;
+        font-family:var(--mono);background:#eee;color:#555}
+  .pill.done{background:var(--accent-soft);color:var(--accent)}
+  .pill.running{background:#fff3d6;color:#8a6100}
+  .pill.error{background:var(--warn-soft);color:var(--warn)}
+  a{color:var(--accent)}
+  .spark{margin-top:8px}
+
+  /* 账号区 */
+  .account{margin-left:auto;display:flex;gap:8px;align-items:center;font-size:12.5px}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);
+          color:var(--accent);display:flex;align-items:center;justify-content:center;
+          font-size:12px;font-weight:600;border:1px solid #cfe0d5}
+  .mask{position:fixed;inset:0;background:rgba(36,35,32,.42);display:none;
+        align-items:center;justify-content:center;z-index:50}
+  .mask.on{display:flex}
+  .dialog{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+          padding:22px 24px;width:min(460px,92vw);box-shadow:0 18px 48px rgba(0,0,0,.18)}
+  .dialog h3{margin:0 0 6px;font-size:15px}
+  .dialog hr{border:none;border-top:1px solid var(--line);margin:16px 0}
+  .err{color:var(--warn);font-size:12.5px;min-height:18px}
+  .hintline{font-size:12.5px;color:var(--accent);min-height:18px}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>orchard310b</h1>
+    <span class="sub">昇腾 YOLOv8 果园检测 · 模型评测与量化实验平台</span>
+    <div class="account" id="account"></div>
+  </div>
+  <div class="badges" id="badges"></div>
+  <nav>
+    <button class="on" data-tab="overview">概览</button>
+    <button data-tab="runs">实验</button>
+    <button data-tab="pareto">帕累托前沿</button>
+    <button data-tab="budget">时延预算</button>
+    <button data-tab="ledger">实验台账</button>
+  </nav>
+</header>
+<main>
+
+<section class="tab on" id="tab-overview">
+  <h2>目标约束 vs 当前实测</h2>
+  <div class="grid" id="stats"></div>
+  <div class="note" id="honest">
+    本平台的 mAP 来自经典 CV 占位检测器，仅用于校验<b>评测协议与后处理</b>；
+    它不是 YOLO 基线，mAP 无业务含义。硬件相关步骤（ATC/AMCT/ACL）需在昇腾机器上执行。
+  </div>
+  <h2>最近一次实验</h2>
+  <div id="latest" class="muted">加载中…</div>
+  <h2>云端状态</h2>
+  <div id="cloudStatus" class="muted">检查中…</div>
+</section>
+
+<section class="tab" id="tab-runs">
+  <h2>发起评测</h2>
+  <div class="form">
+    <input id="runName" placeholder="实验名，如 baseline_v1" size="26">
+    <label class="muted">conf
+      <input id="confThr" type="number" step="0.05" min="0.01" max="0.99" value="0.25" style="width:80px">
+    </label>
+    <button class="act" id="btnRun">跑一次评测</button>
+    <span class="muted" id="runHint"></span>
+  </div>
+  <div class="note">评测在服务端执行；完成后会把这条记录同步到云端（需要登录）。
+    未登录时只在本地保存，云端看板看不到。</div>
+  <h2>实验列表 <span class="tag" id="runsSource">（读取中…）</span></h2>
+  <table>
+    <thead><tr><th>#</th><th>名称</th><th>提交者</th><th>状态</th><th>mAP50</th><th>mAP50-95</th>
+      <th>p50(ms)</th><th>p99(ms)</th><th>时间</th><th></th></tr></thead>
+    <tbody id="runsBody"><tr><td colspan="10" class="muted">加载中…</td></tr></tbody>
+  </table>
+</section>
+
+<section class="tab" id="tab-pareto">
+  <h2>精度-时延帕累托前沿</h2>
+  <div class="form">
+    <button class="ghost" onclick="refreshPareto()">刷新图</button>
+    <span class="muted">实心点=平台实测；空心三角=待昇腾实测的占位（任务书口径）</span>
+  </div>
+  <div class="figure"><img id="paretoImg" src="/figures/pareto.png" alt="pareto"></div>
+  <div class="note">每个实心点是一次真实评测（本机 CPU 占位检测器）；接入昇腾后，
+    OM FP16 / INT8 / 混合精度的实测点会以实心形式补进来，空心占位即可删除。</div>
+</section>
+
+<section class="tab" id="tab-budget">
+  <h2>端到端时延预算（六段拆分）</h2>
+  <div class="form">
+    <input type="file" id="budgetFile" accept=".csv,text/csv">
+    <button class="ghost" onclick="ingest()">扫描服务端 inbox</button>
+    <span class="muted" id="budgetHint">上传 msprof 导出的 <code>op_summary.csv</code>：归档到云存储、解析后写入云端</span>
+  </div>
+  <div class="figure"><img id="budgetImg" src="/figures/budget.png" alt="budget"></div>
+  <h2>云端预算记录</h2>
+  <div id="budgetList" class="muted">读取中…</div>
+</section>
+
+<section class="tab" id="tab-ledger">
+  <h2>实验台账</h2>
+  <div class="form">
+    <button class="ghost" id="btnLedgerCsv">下载云端台账 CSV</button>
+    <a class="ghost" href="/api/ledger.csv" download>下载本地 ledger.csv</a>
+    <span class="muted">云端台账由所有已同步的实验记录生成</span>
+  </div>
+  <div id="ledgerBox" class="muted">加载中…</div>
+</section>
+
+</main>
+
+<!-- 登录 -->
+<div class="mask" id="loginMask">
+  <div class="dialog">
+    <h3>登录后把实验记录同步到云端</h3>
+    <p class="muted" style="margin:0 0 14px">
+      浏览公开实验看板不需要登录；<b>提交实验</b>和<b>上传 msprof 数据</b>需要登录，
+      记录会记在你名下，只有你能删。
+    </p>
+    <div class="form" style="margin-bottom:6px">
+      <input id="phone" placeholder="手机号" maxlength="11" style="width:150px">
+      <button class="ghost" id="btnSendCode" type="button">获取验证码</button>
+    </div>
+    <div class="form">
+      <input id="code" placeholder="验证码" style="width:120px">
+      <button class="act" id="btnPhoneLogin" type="button">登录 / 注册</button>
+    </div>
+    <div class="err" id="loginErr"></div>
+    <hr>
+    <div class="form" style="margin-bottom:6px">
+      <button class="ghost" id="btnWxLogin" type="button">微信扫码登录</button>
+      <button class="ghost" id="btnCloseLogin" type="button">关闭</button>
+    </div>
+    <div class="muted">微信登录会跳转到授权页，授权后返回本页。</div>
+  </div>
+</div>
+
+<script src="/static/cloud-config.js"></script>
+<!-- 官方 @tencent-ai/workbuddy-cloud-sdk 的 IIFE 构建产物，自托管一份：
+     这台机器和容器环境访问不到 jsdelivr，而本项目本来就要求离线可跑，
+     依赖外部 CDN 会让页面在无外网时直接白屏。版本见 vendor/*.package.json。 -->
+<script src="/static/vendor/workbuddy-cloud-sdk.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const fmt = (v, d=4) => (v===null||v===undefined) ? "—" : Number(v).toFixed(d);
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ------------------------------------------------------------------ *
+ * 云服务客户端：只用 publicConfig 里的 endpoint / publishableKey 初始化。
+ * endpoint 必须显式传入，不能靠同源兜底、也不能硬编码别处。
+ * ------------------------------------------------------------------ */
+let cloud = null, cloudReady = false, session = null;
+let pendingOtp = null;
+const TABLES = { runs: "orchard_runs", budgets: "orchard_budgets" };
+
+function initCloud(){
+  const cfg = window.ORCHARD_CLOUD || {};
+  if (!window.WorkBuddyCloud){
+    cloudStatus("云 SDK 未加载（可能离线或被拦截），当前只有本地功能。", true);
+    return;
+  }
+  if (!cfg.endpoint || !cfg.publishableKey){
+    cloudStatus("缺少 publicConfig，云端功能不可用。", true);
+    return;
+  }
+  cloud = window.WorkBuddyCloud.createWorkBuddyCloud({
+    endpoint: cfg.endpoint,
+    oauthRelayBaseUrl: cfg.oauthRelayBaseUrl,
+    publishableKey: cfg.publishableKey
+  });
+  cloudReady = true;
+}
+
+function cloudStatus(text, isErr){
+  const el = $("#cloudStatus");
+  if(!el) return;
+  el.className = isErr ? "note" : "muted";
+  el.textContent = text;
+}
+
+/* 账号 ------------------------------------------------------------- */
+function renderAccount(){
+  const box = $("#account");
+  if(!cloudReady){ box.innerHTML = '<span class="muted">云端未连接</span>'; return; }
+  if(session && session.user){
+    const u = session.user;
+    const name = u.name || u.phone || u.email || "已登录用户";
+    const initial = (u.name || "U").slice(0,1).toUpperCase();
+    box.innerHTML = `<span class="avatar">${esc(initial)}</span>
+      <span>${esc(name)}</span>
+      <button class="ghost" id="btnLogout">退出</button>`;
+    $("#btnLogout").onclick = async () => {
+      await cloud.auth.signOut();
+      session = null; renderAccount(); loadCloudAll();
+    };
+  } else {
+    box.innerHTML = '<span class="muted">未登录</span><button class="ghost" id="btnOpenLogin">登录</button>';
+    $("#btnOpenLogin").onclick = () => openLogin("");
+  }
+}
+
+function openLogin(tip){
+  $("#loginErr").textContent = "";
+  $("#loginErr").className = "hintline";
+  $("#loginErr").textContent = tip || "";
+  $("#loginMask").classList.add("on");
+}
+function loginErr(msg){ const e=$("#loginErr"); e.className="err"; e.textContent = msg || ""; }
+
+async function refreshSession(){
+  if(!cloudReady) { renderAccount(); return; }
+  try {
+    const { data } = await cloud.auth.getSession();
+    session = data || null;
+  } catch(e) {
+    session = null;
+  }
+  renderAccount();
+}
+
+/* 处理 OAuth 回调：必须在任何"未登录就弹登录框"的逻辑之前跑，
+   否则一次性 code 会被丢掉。 */
+async function restoreAuth(){
+  if(!cloudReady) return;
+  const url = new URL(location.href);
+  if (url.searchParams.has("code") || url.searchParams.has("error")){
+    const provider = url.searchParams.get("provider");
+    if (provider === "wechat"){
+      const handler = cloud.auth.handleWechatWebCallback;
+      if (typeof handler !== "function"){
+        loginErr("当前 SDK 版本不支持微信回跳处理，请改用手机号登录。");
+      } else {
+        const { data, error } = await handler.call(cloud.auth);
+        if (error) loginErr(error.message);
+        else if (data) { $("#loginMask").classList.remove("on"); }
+      }
+    }
+    // 无论成败都清掉一次性参数，避免刷新时重放已作废的 code
+    for (const k of ["code","state","provider"]) url.searchParams.delete(k);
+    history.replaceState(null, "", url.pathname + url.search + url.hash);
+  }
+  await refreshSession();
+}
+
+/* 手机验证码 ------------------------------------------------------- */
+async function sendCode(){
+  if(!cloudReady){ loginErr("云端未连接"); return; }
+  const phone = ($("#phone").value || "").trim();
+  if(!/^1\d{10}$/.test(phone)){ loginErr("请输入正确的 11 位手机号"); return; }
+  loginErr("");
+  const sent = await cloud.auth.sendOtp({ phone });
+  if(sent.error){ loginErr(sent.error.message); return; }
+  pendingOtp = {
+    phone,
+    verificationId: sent.data.verificationId,
+    isExistingUser: sent.data.isExistingUser
+  };
+  const e=$("#loginErr"); e.className="hintline"; e.textContent = "验证码已发送";
+}
+
+async function submitCode(){
+  if(!cloudReady){ loginErr("云端未连接"); return; }
+  const phone = ($("#phone").value || "").trim();
+  const token = ($("#code").value || "").trim();
+  if(!pendingOtp || pendingOtp.phone !== phone){
+    loginErr("请先获取当前手机号的验证码"); return;
+  }
+  if(!token){ loginErr("请输入验证码"); return; }
+  const done = await cloud.auth.verifyOtp({
+    phone: pendingOtp.phone,
+    verificationId: pendingOtp.verificationId,
+    isExistingUser: pendingOtp.isExistingUser,
+    token
+  });
+  if(done.error){ loginErr(done.error.message); return; }
+  pendingOtp = null;
+  $("#loginMask").classList.remove("on");
+  await refreshSession();
+  await loadCloudAll();
+}
+
+async function wechatLogin(){
+  if(!cloudReady){ loginErr("云端未连接"); return; }
+  const back = new URL(location.href);
+  back.pathname = "/";
+  for (const k of ["code","state","provider"]) back.searchParams.delete(k);
+  const { data, error } = await cloud.auth.signInWithOAuth({
+    provider: "wechat",
+    redirectTo: back.toString()
+  });
+  if(error){ loginErr(error.message); return; }
+  location.assign(data.url);   // 必须同标签页跳转，PKCE 证明存在本页 sessionStorage
+}
+
+/* 云端数据 ------------------------------------------------------- */
+async function loadCloudRuns(){
+  if(!cloudReady) return { data: [], error: new Error("cloud not ready") };
+  const r = await cloud.database.from(TABLES.runs)
+    .select("id,owner_name,name,status,local_run_id,map50,map50_95,p50_ms,p99_ms,created_at")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  return { data: r.data || [], error: r.error || null };
+}
+
+async function insertRun(row, conf){
+  if(!cloudReady || !session) return { error: new Error("not signed in") };
+  const r = await cloud.database.from(TABLES.runs).insert({
+    owner_name: (session.user && session.user.name) || null,
+    local_run_id: row.id,
+    name: row.name,
+    detector: row.detector || "toy",
+    conf_thr: conf,
+    status: row.status || "done",
+    map50: row.map50,
+    map50_95: row.map50_95,
+    p50_ms: row.p50_ms,
+    p99_ms: row.p99_ms,
+    n_val: row.n_val
+  }).select();
+  return { error: r.error || null };
+}
+
+async function loadCloudBudgets(){
+  if(!cloudReady) return { data: [], error: new Error("cloud not ready") };
+  const r = await cloud.database.from(TABLES.budgets)
+    .select("id,owner_name,name,source_file,object_path,stages,p50_ms,created_at")
+    .order("created_at", { ascending: false })
+    .limit(20);
+  return { data: r.data || [], error: r.error || null };
+}
+
+async function loadCloudAll(){
+  if(!cloudReady) return;
+  const [runs, budgets] = await Promise.all([loadCloudRuns(), loadCloudBudgets()]);
+  if(runs.error){
+    cloudStatus("读取云端实验失败：" + (runs.error.message || runs.error.code || "未知错误"), true);
+  } else {
+    cloudStatus("云服务已连接：云端实验 " + runs.data.length + " 条，云端预算 " +
+      budgets.data.length + " 条。浏览公开，写入需要登录。", false);
+  }
+  renderRuns(runs.data);
+  renderBudgets(budgets.data);
+  renderLedger(runs.data);
+}
+
+/* 渲染 ----------------------------------------------------------- */
+function renderRuns(runs){
+  $("#runsSource").textContent = cloudReady ? "（来自云端 orchard_runs）" : "（本地）";
+  if(!runs.length){
+    $("#runsBody").innerHTML =
+      '<tr><td colspan="10" class="muted">云端还没有实验记录。登录后在「实验」页跑一次即可同步。</td></tr>';
+    return;
+  }
+  $("#runsBody").innerHTML = runs.map(r => `<tr>
+    <td class="num">${r.id}</td>
+    <td>${esc(r.name)}</td>
+    <td class="muted">${esc(r.owner_name || "—")}</td>
+    <td><span class="pill ${esc(r.status||"done")}">${esc(r.status||"done")}</span></td>
+    <td class="num">${fmt(r.map50)}</td><td class="num">${fmt(r.map50_95)}</td>
+    <td class="num">${fmt(r.p50_ms,2)}</td><td class="num">${fmt(r.p99_ms,2)}</td>
+    <td class="muted">${esc((r.created_at||"").replace("T"," ").slice(0,19))}</td>
+    <td>${r.local_run_id ? `<a href="/api/runs/${r.local_run_id}/report" target="_blank">本机报告</a>` : ""}</td>
+  </tr>`).join("");
+}
+
+function renderBudgets(rows){
+  if(!rows.length){
+    $("#budgetList").innerHTML = "云端还没有预算记录。上传一份 op_summary.csv 试试。";
+    return;
+  }
+  $("#budgetList").innerHTML = rows.map(b => {
+    const st = b.stages || {};
+    const brief = Object.keys(st).filter(k => st[k] && st[k].p50 != null)
+      .map(k => `${k} ${fmt(st[k].p50,2)}`).join(" · ");
+    const link = b.object_path
+      ? `<span class="tag">stored: ${esc(b.object_path)}</span>` : "";
+    return `<div style="margin-bottom:8px">
+      <b>${esc(b.name)}</b> <span class="muted">${esc(b.owner_name||"—")} ·
+      p50 ${fmt(b.p50_ms,2)}ms · ${esc((b.created_at||"").replace("T"," ").slice(0,19))}</span>
+      <div class="muted" style="font-family:var(--mono);font-size:11.5px">${brief}</div>
+      ${link}
+    </div>`;
+  }).join("");
+}
+
+function renderLedger(runs){
+  if(!runs.length){ $("#ledgerBox").textContent = "云端台账为空"; return; }
+  const head = ["exp_id","created_at","owner","name","map50","map50_95","p50_ms","p99_ms"];
+  const body = runs.map(r => [r.id, (r.created_at||"").replace("T"," ").slice(0,19),
+    r.owner_name||"", r.name, fmt(r.map50,4), fmt(r.map50_95,4),
+    fmt(r.p50_ms,2), fmt(r.p99_ms,2)]);
+  $("#ledgerBox").innerHTML = `<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead>
+    <tbody>${body.map(r=>`<tr>${r.map(c=>`<td class="num">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  $("#btnLedgerCsv").onclick = () => {
+    const csv = [head.join(",")].concat(body.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(","))).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+    const a = document.createElement("a");
+    a.href = url; a.download = "cloud_ledger.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+}
+
+/* 本地接口（评测计算仍在服务端跑） ------------------------------- */
+async function refreshOverview(){
+  const r = await fetch("/api/overview").then(x=>x.json());
+  const t = r.targets, s = r.stats, L = r.latest;
+  $("#badges").innerHTML="";
+  $("#badges").append(badge("端到端 p50 ≤ "+t.latency_p50_ms+"ms"),
+                      badge("掉点 ≤ "+t.map_drop_pt+"pt"),
+                      badge("Device ≤ "+t.device_mem_mb+"MB"),
+                      badge("≥ "+t.fps+" FPS"));
+  const latOk = L ? L.p50_ms <= t.latency_p50_ms : null;
+  $("#stats").innerHTML = `
+    <div class="card"><div class="k">本地实验 / 完成</div>
+      <div class="v">${s.total} <small>/ ${s.done}</small></div></div>
+    <div class="card"><div class="k">最新 mAP50-95</div>
+      <div class="v">${L?fmt(L.map50_95):"—"}</div></div>
+    <div class="card"><div class="k">最新 p50 时延</div>
+      <div class="v ${latOk===null?"":(latOk?"ok":"bad")}">${L?fmt(L.p50_ms,2):"—"} <small>ms</small></div></div>
+    <div class="card"><div class="k">时延达标</div>
+      <div class="v ${latOk===null?"":(latOk?"ok":"bad")}">${latOk===null?"—":(latOk?"达标":"超标")}</div></div>`;
+  $("#latest").innerHTML = L
+    ? `#${L.id} <b>${esc(L.name)}</b> · mAP50 ${fmt(L.map50)} · mAP50-95 ${fmt(L.map50_95)}
+       · p50 ${fmt(L.p50_ms,2)}ms · ${esc(L.finished_at||"")}
+       · <a href="/api/runs/${L.id}/report" target="_blank">查看报告</a>`
+    : `<span class="muted">还没有完成的实验，去「实验」页跑一次。</span>`;
+}
+
+function badge(txt, ok){
+  const d=document.createElement("span");
+  d.className="badge"; d.textContent=txt;
+  if(ok===false){ d.style.background="#fbeee5"; d.style.color="#b4541f"; d.style.borderColor="#f0d6c6"; }
+  return d;
+}
+
+async function waitRun(id){
+  for(let i=0;i<150;i++){
+    const r = await fetch("/api/runs/"+id).then(x=>x.json());
+    if(r.status==="done" || r.status==="error") return r;
+    await new Promise(res=>setTimeout(res,800));
+  }
+  return null;
+}
+
+$("#btnRun").onclick = async () => {
+  if(!cloudReady || !session){
+    openLogin("提交实验需要登录：记录要记在你名下。");
+    return;
+  }
+  const name = $("#runName").value.trim() || ("run_" + new Date().toISOString().slice(11,19));
+  const conf = parseFloat($("#confThr").value) || 0.25;
+  const hint = $("#runHint");
+  hint.className = "muted";
+  hint.textContent = "已提交，服务端执行中…";
+  const created = await fetch("/api/runs", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({name, conf_thr:conf})
+  }).then(x=>x.json());
+
+  const done = await waitRun(created.id);
+  if(!done || done.status !== "done"){
+    hint.className = "err";
+    hint.textContent = "评测失败：" + ((done && done.error) || "超时");
+    return;
+  }
+  const synced = await insertRun(done, conf);
+  if(synced.error){
+    hint.className = "err";
+    hint.textContent = "本地完成，但同步云端失败：" + (synced.error.message || synced.error.code || "");
+  } else {
+    hint.textContent = "完成并已同步到云端（run #" + done.id + "）";
+  }
+  refreshOverview();
+  loadCloudAll();
+};
+
+function refreshPareto(){ $("#paretoImg").src = "/figures/pareto.png?t=" + Date.now(); }
+
+async function refreshBudget(){
+  $("#budgetImg").src = "/figures/budget.png?t=" + Date.now();
+  const { data } = await loadCloudBudgets();
+  renderBudgets(data);
+}
+
+async function ingest(){
+  const r = await fetch("/api/budget/ingest", {method:"POST"}).then(x=>x.json());
+  alert("服务端 inbox 入库 " + r.ingested + " 份");
+  refreshBudget();
+}
+
+/* 上传 msprof CSV：先归档到云存储，再交服务端解析，最后写云端记录 */
+$("#budgetFile").onchange = async (ev) => {
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  const hint = $("#budgetHint");
+  hint.className = "muted";
+  if(!cloudReady || !session){
+    openLogin("上传 msprof 数据需要登录。");
+    ev.target.value = "";
+    return;
+  }
+  hint.textContent = "上传中…";
+  const text = await file.text();
+  const safe = file.name.replace(/[^\w.\-]/g, "_");
+  let objectPath = "";
+  try {
+    objectPath = cloud.storage.userPath(session.user.id, "msprof/" + Date.now() + "_" + safe);
+    const up = await cloud.storage.upload(objectPath, file, { contentType: "text/csv" });
+    if(up.error){
+      objectPath = "";
+      hint.className = "err";
+      hint.textContent = "云存储归档失败：" + (up.error.message || "");
+    }
+  } catch(e) {
+    objectPath = "";
+    hint.className = "err";
+    hint.textContent = "云存储归档失败：" + e.message;
+  }
+
+  hint.textContent = "解析中…";
+  const resp = await fetch("/api/budget/parse", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ name: file.name, content: text })
+  });
+  const out = await resp.json();
+  if(!resp.ok){
+    hint.className = "err";
+    hint.textContent = "解析失败：" + (out.error || resp.status);
+    ev.target.value = "";
+    return;
+  }
+  const e2e = out.summary.end_to_end;
+  const ins = await cloud.database.from(TABLES.budgets).insert({
+    owner_name: (session.user && session.user.name) || null,
+    name: file.name,
+    source_file: file.name,
+    object_path: objectPath || null,
+    stages: out.summary.stages,
+    p50_ms: e2e.p50
+  }).select();
+  if(ins.error){
+    hint.className = "err";
+    hint.textContent = "已解析，但写云端失败：" + (ins.error.message || ins.error.code || "");
+  } else {
+    hint.className = "muted";
+    hint.textContent = "已归档" + (objectPath ? "并写入云端" : "（仅本地）") +
+      "：p50 " + fmt(e2e.p50, 2) + "ms";
+  }
+  ev.target.value = "";
+  refreshBudget();
+  loadCloudAll();
+};
+
+/* 启动 ----------------------------------------------------------- */
+$("#btnSendCode").onclick = sendCode;
+$("#btnPhoneLogin").onclick = submitCode;
+$("#btnWxLogin").onclick = wechatLogin;
+$("#btnCloseLogin").onclick = () => $("#loginMask").classList.remove("on");
+
+document.querySelectorAll("nav button").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("on"));
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    $("#tab-"+b.dataset.tab).classList.add("on");
+    if (b.dataset.tab==="pareto") refreshPareto();
+    if (b.dataset.tab==="budget") refreshBudget();
+    if (b.dataset.tab==="ledger") loadCloudAll();
+  };
+});
+
+(async function boot(){
+  initCloud();
+  await restoreAuth();          // 先处理 OAuth 回调，再做任何"未登录"判断
+  renderAccount();
+  refreshOverview();
+  await loadCloudAll();
+  setInterval(refreshOverview, 5000);
+})();
+</script>
+</body>
+</html>

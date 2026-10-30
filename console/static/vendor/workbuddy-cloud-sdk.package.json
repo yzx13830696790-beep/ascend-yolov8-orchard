@@ -1,0 +1,120 @@
+{
+  "name": "@tencent-ai/workbuddy-cloud-sdk",
+  "version": "0.1.4-dev.ca27990.202610161713",
+  "private": false,
+  "description": "WorkBuddy Cloud SDK — auth / database / storage / llm modules for generated applications.",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "miniprogram": "miniprogram_dist",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/index.d.ts",
+        "default": "./lib/index.js"
+      },
+      "require": {
+        "types": "./lib/index.d.cts",
+        "default": "./lib/index.cjs"
+      },
+      "default": "./lib/index.js"
+    },
+    "./global": "./lib/index.global.js",
+    "./miniprogram": {
+      "import": {
+        "types": "./lib/miniprogram.d.ts",
+        "default": "./lib/miniprogram.js"
+      },
+      "require": {
+        "types": "./lib/miniprogram.d.cts",
+        "default": "./lib/miniprogram.cjs"
+      },
+      "default": "./lib/miniprogram.js"
+    }
+  },
+  "unpkg": "lib/index.global.js",
+  "jsdelivr": "lib/index.global.js",
+  "files": [
+    "lib/*.js",
+    "lib/*.cjs",
+    "lib/*.d.ts",
+    "lib/*.d.cts",
+    "miniprogram_dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "workbuddy",
+    "cloud",
+    "baas",
+    "sdk"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "customPackage": {
+      "name": "@tencent-ai/workbuddy-cloud-sdk",
+      "private": false,
+      "version": "0.1.4",
+      "description": "WorkBuddy Cloud SDK — auth / database / storage / llm modules for generated applications.",
+      "type": "module",
+      "main": "lib/index.cjs",
+      "module": "lib/index.js",
+      "types": "lib/index.d.ts",
+      "miniprogram": "miniprogram_dist",
+      "exports": {
+        ".": {
+          "import": {
+            "types": "./lib/index.d.ts",
+            "default": "./lib/index.js"
+          },
+          "require": {
+            "types": "./lib/index.d.cts",
+            "default": "./lib/index.cjs"
+          },
+          "default": "./lib/index.js"
+        },
+        "./global": "./lib/index.global.js",
+        "./miniprogram": {
+          "import": {
+            "types": "./lib/miniprogram.d.ts",
+            "default": "./lib/miniprogram.js"
+          },
+          "require": {
+            "types": "./lib/miniprogram.d.cts",
+            "default": "./lib/miniprogram.cjs"
+          },
+          "default": "./lib/miniprogram.js"
+        }
+      },
+      "unpkg": "lib/index.global.js",
+      "jsdelivr": "lib/index.global.js",
+      "sideEffects": false,
+      "files": [
+        "lib/*.js",
+        "lib/*.cjs",
+        "lib/*.d.ts",
+        "lib/*.d.cts",
+        "miniprogram_dist",
+        "README.md",
+        "LICENSE"
+      ],
+      "license": "MIT",
+      "engines": {
+        "node": ">=18"
+      },
+      "dependencies": {},
+      "devDependencies": {},
+      "scripts": {}
+    },
+    "tag": "dev"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

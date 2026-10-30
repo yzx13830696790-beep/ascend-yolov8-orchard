@@ -1,0 +1,9 @@
+{
+  "correct_config_errors": [],
+  "taskbook_wrong_config_errors": [
+    "Ascend310B4 需要 CANN >= 7.0.RC1，当前 6.3.RC2 的 ATC 不认识该 soc_version",
+    "DVPP 硬解码输出 YUV420SP，AIPP 应设 YUV420SP_U8 + csc_switch=true；写 RGB 会让预处理退回 Host",
+    "force_fp16 与 op_select_implmode=high_precision 语义冲突：敏感算子会回落 FP32，抵消 FP16 的性能收益",
+    "csc 矩阵 BT709 与训练侧 BT601 不一致，mAP 可能掉 5~12pt"
+  ]
+}

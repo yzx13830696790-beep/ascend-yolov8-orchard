@@ -1,0 +1,9 @@
+# 本机（Windows/Python3.8）已具备：numpy、opencv、matplotlib、Pillow
+# 缺什么装什么；训练/量化/昇腾侧依赖见 Dockerfile。
+numpy>=1.24
+opencv-python>=4.8
+matplotlib>=3.6
+# 训练/导出（训练机）：
+# torch>=2.0
+# ultralytics>=8.0
+# 可选：onnx>=1.14（用于 export/check_contract.py 的结构级校验）

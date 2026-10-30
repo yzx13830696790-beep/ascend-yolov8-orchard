@@ -1,0 +1,98 @@
+{
+  "run_id": 2,
+  "detector": "toy",
+  "conf_thr": 0.35,
+  "meta": {
+    "n_val": 27,
+    "note": "toy 检测器仅校验评测协议，mAP 无业务含义"
+  },
+  "metrics": {
+    "map50": 0.16895234718657023,
+    "map50_95": 0.12858749682369727,
+    "per_class_ap50": {
+      "0": 0.5914707540021107,
+      "1": 0.01997600792781516,
+      "2": 0.00936768149882904,
+      "3": 0.054994945317525974
+    },
+    "per_class_map": {
+      "0": 0.48215559860304386,
+      "1": 0.008485708018105904,
+      "2": 0.004215456674473068,
+      "3": 0.019493223999166275
+    },
+    "num_gt": 400,
+    "classes_evaluated": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "class_names": {
+      "0": "apple",
+      "1": "apple_occluded",
+      "2": "branch",
+      "3": "leaf_cluster"
+    }
+  },
+  "business": {
+    "miss_count": 176,
+    "gt_pickable": 317,
+    "miss_rate": 0.555205047318612,
+    "fp_count": 136,
+    "pred_count": 277,
+    "fp_rate": 0.49097472924187724
+  },
+  "latency": {
+    "stages": {
+      "decode_dvpp": {
+        "p50": null,
+        "p90": null,
+        "p99": null,
+        "mean": null,
+        "n": 0
+      },
+      "h2d_copy": {
+        "p50": null,
+        "p90": null,
+        "p99": null,
+        "mean": null,
+        "n": 0
+      },
+      "model_infer": {
+        "p50": 11.335899999998844,
+        "p90": 18.602499999995814,
+        "p99": 33.77505999999852,
+        "mean": 13.160977777777587,
+        "n": 27
+      },
+      "d2h_copy": {
+        "p50": null,
+        "p90": null,
+        "p99": null,
+        "mean": null,
+        "n": 0
+      },
+      "postprocess_nms": {
+        "p50": null,
+        "p90": null,
+        "p99": null,
+        "mean": null,
+        "n": 0
+      },
+      "ros_publish": {
+        "p50": null,
+        "p90": null,
+        "p99": null,
+        "mean": null,
+        "n": 0
+      }
+    },
+    "end_to_end": {
+      "p50": 11.335899999998844,
+      "p90": 18.602499999995814,
+      "p99": 33.77505999999852
+    }
+  },
+  "wall_ms": 853.1918999999988
+}

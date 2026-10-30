@@ -1,0 +1,15 @@
+# 行尾统一 LF。
+# 原因：deploy/ 下的 .sh 与 CMakeLists.txt 是给 Linux 昇腾机器用的，
+# Windows 开发者如果提交 CRLF，脚本在目标机会报 `\r: command not found`，
+# 而这类错误在本机完全复现不出来。统一 LF 之后， checkout 到 Windows 也不会被自动改回。
+* text=auto eol=lf
+
+# 二进制不做任何转换
+*.png  binary
+*.jpg  binary
+*.ico  binary
+*.db   binary
+*.tgz  binary
+
+# 大段第三方产物不计入语言统计，也不进 diff
+console/static/vendor/*.js linguist-vendored

@@ -1,0 +1,25 @@
+{
+  "classes": ["apple", "apple_occluded", "branch", "leaf_cluster"],
+  "class_names": {
+    "0": "apple",
+    "1": "apple_occluded",
+    "2": "branch",
+    "3": "leaf_cluster"
+  },
+  "scenes": ["sunny", "backlit", "overcast", "night", "rain", "blur"],
+  "input_size": [640, 640],
+  "conf_thr": 0.25,
+  "iou_thr": 0.45,
+  "nms_iou": 0.7,
+  "business_conf": 0.3,
+  "business_iou": 0.5,
+  "min_visible": 0.5,
+  "budget": {
+    "latency_p50_ms": 30,
+    "latency_p99_ms": 45,
+    "map_drop_pt": 1.0,
+    "device_mem_mb": 200,
+    "om_size_mb": 4,
+    "fps": 30
+  }
+}

@@ -1,0 +1,8 @@
+name,name_en,latency_ms,map50_95,measured
+CPU toy 基线（实测）,CPU toy baseline,9.81,0.1408,1
+GPU FP32（任务书口径，待复核）,"GPU FP32 (doc, TBC)",42,0.86,0
+OM FP16(AIPP),OM FP16 (AIPP),22,0.86,0
+OM FP16+三线程流水,OM FP16+3thread,16,0.86,0
+OM INT8 PTQ,OM INT8 PTQ,13,0.85,0
+OM INT8 混合精度,INT8 mixed-prec.,11,0.85,0
+OM INT8+DVPP+流水（目标）,INT8+DVPP+pipeline,11,0.85,0
