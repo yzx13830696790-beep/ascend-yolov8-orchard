@@ -12,6 +12,7 @@
 Python 3.8+ · numpy / opencv / matplotlib · 零第三方 Web 框架 · 19 个单元测试全绿
 ```
 
+**源代码**：https://github.com/yzx13830696790-beep/ascend-yolov8-orchard
 **在线地址**：https://orchard-yolo310b.app.workbuddy.host/?sharecode=2AK5AM4TSK
 （实验看板，免安装直接打开；未登录可看，提交实验/上传 CSV 需登录）
 
@@ -152,6 +153,7 @@ console/                      实验平台
   static/index.html           单页看板，不依赖任何 CDN
   static/vendor/              自托管的云服务 SDK（见第八节）
 docs/                         00 状态 / 01 版本矩阵 / 02 踩坑机制 / 03 面试问答
+                              ci-workflow.yml  GitHub Actions 配置（启用方式见文末）
 tests/test_core.py            19 个单元测试
 results/                      **实验证据链，随仓库版本化**
 ```
@@ -284,6 +286,24 @@ Markdown 报告）、帕累托前沿（每跑一次多一个实心实测点）�
 ## License
 
 MIT，见 [LICENSE](./LICENSE)。
+
+---
+
+## 附：启用 CI
+
+工作流配置放在 **`docs/ci-workflow.yml`**。GitHub 只认 `.github/workflows/` 下的 YAML，
+所以拷一步就能用，不用改任何内容：
+
+```bash
+mkdir -p .github/workflows && cp docs/ci-workflow.yml .github/workflows/ci.yml
+```
+
+它会做三件事：跑 19 个单元测试、跑端到端 `run_demo.py`、把 `results/` 上传为
+evidence artifact。Python 版本矩阵是 3.8 与 3.11。
+
+之所以没有直接放在 `.github/workflows/` 下，是因为这次推送走的通道不允许向
+`.github/` 路径写入；把配置留在 `docs/` 里同样能随仓库交付，只是需要这一步手动启用。
+依赖清单刻意没用 `-r requirements.txt`，原因写在那个文件的注释里。
 
 ---
 
