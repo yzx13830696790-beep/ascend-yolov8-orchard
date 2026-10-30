@@ -289,21 +289,15 @@ MIT，见 [LICENSE](./LICENSE)。
 
 ---
 
-## 附：启用 CI
+## 附：CI
 
-工作流配置放在 **`docs/ci-workflow.yml`**。GitHub 只认 `.github/workflows/` 下的 YAML，
-所以拷一步就能用，不用改任何内容：
+工作流已在 **`.github/workflows/ci.yml`**，push / PR 到 `main` 自动触发，也可手动
+`workflow_dispatch`。它做三件事：跑 19 个单元测试、跑端到端 `run_demo.py`、把
+`results/` 上传为 evidence artifact。Python 版本矩阵是 3.8 与 3.11（在 CI 里用
+`opencv-python-headless`，容器内没有 libGL），依赖清单刻意没用 `-r requirements.txt`，
+原因写在那个文件的注释里。
 
-```bash
-mkdir -p .github/workflows && cp docs/ci-workflow.yml .github/workflows/ci.yml
-```
-
-它会做三件事：跑 19 个单元测试、跑端到端 `run_demo.py`、把 `results/` 上传为
-evidence artifact。Python 版本矩阵是 3.8 与 3.11。
-
-之所以没有直接放在 `.github/workflows/` 下，是因为这次推送走的通道不允许向
-`.github/` 路径写入；把配置留在 `docs/` 里同样能随仓库交付，只是需要这一步手动启用。
-依赖清单刻意没用 `-r requirements.txt`，原因写在那个文件的注释里。
+也就是说：**README 里"本机实测"的所有数字，任何人 clone 下来都能一键复算。**
 
 ---
 

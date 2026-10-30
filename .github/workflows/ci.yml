@@ -1,10 +1,7 @@
-# GitHub Actions 工作流 —— 把本文件放到 `.github/workflows/ci.yml` 即可启用。
+# GitHub Actions 工作流：push / PR 到 main 时自动验证。
 #
-# 为什么不直接放在 .github/workflows/ 下：本机托管的发布通道禁止向 .github/
-# 路径写入（这部分由安全策略管控），所以配置文件先随仓库提供在这里。
-# GitHub 只认 .github/workflows/ 下的 YAML，拷贝过去即刻生效，无需任何修改。
-#
-#   mkdir -p .github/workflows && cp docs/ci-workflow.yml .github/workflows/ci.yml
+# 验证三件事：19 个单元测试、端到端 run_demo.py、把 results/ 上传为 evidence artifact。
+# 依赖用 headless OpenCV（CI 镜像没有 libGL），Python 矩阵为 3.8 与 3.11。
 #
 name: CI
 
